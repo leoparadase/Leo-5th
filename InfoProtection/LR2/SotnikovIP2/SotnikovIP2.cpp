@@ -202,6 +202,7 @@ void encoded_moves()
 	cout << "Guessed word (1st attempt): " << guessedWord << endl << endl;
 
 	//-----------------ANOTHER TRY TO GUESS KEY WORD-------------------------------
+	guessedWord.clear();
 
 	for (int i = 1; i < prediction + 1; ++i)
 	{
@@ -220,10 +221,9 @@ void encoded_moves()
 		int max = *max_element(freq.begin(), freq.end());
 		auto freq_symbol = find(freq.begin(), freq.end(), max);
 		int index = std::distance(freq.begin(), freq_symbol);
-		cout << "Guessed word (2st attempt): ";
-		cout << char(index - 32);
+		guessedWord = guessedWord + char(index - 32);
 	}
-
+	cout << "Guessed word (2st attempt): " << guessedWord << endl << endl;
 	//-----------------------------------------------------------------------------
 	// Decryption
 
@@ -247,13 +247,66 @@ void encoded_moves()
 	cout << "Done." << endl << endl;
 }
 
+void Something(std::ifstream& inputFile, std::string& inputFileName, std::ofstream& outputFile, std::string& outputFileName, char& i, int a, char& o, std::string& keyword, int& k)
+{
+	inputFile.open(inputFileName, ios::binary);
+	outputFile.open(outputFileName, ios::binary);
+
+	if (inputFile.good())
+	{
+		while (inputFile.get(i))
+		{
+			switch (a)
+			{
+			case 1:
+			{
+				o = i + keyword[k % keyword.size()];
+				outputFile << o;
+				k++;
+				break;
+			}
+			case 2:
+			{
+				o = i - keyword[k % keyword.size()];
+				outputFile << o;
+				k++;
+				break;
+			}
+			}
+		}
+		cout << "Done." << endl << endl;
+	}
+	else
+	{
+		cout << "Can't load from file." << endl << endl;
+	}
+}
+
+void NamesFilling(std::string& inputFileName, std::string& outputFileName, std::string& keyword)
+{
+	cout << "Enter input file's name: ";
+	cin >> inputFileName;
+	cout << endl;
+
+	cout << "Enter output file's name: ";
+	cin >> outputFileName;
+	cout << endl;
+
+	cout << "Enter keyword: ";
+	cin >> keyword;
+	cout << endl;
+}
+
 int main()
 {
+	setlocale(LC_ALL, "Russian");
+	
 	while (1) 
 	{
 		cout << "Choose the action: " << endl << endl
 			<< "1. Standard's analysis" << endl
 			<< "2. Analysis & decryprtion of encoded file" << endl
+			<< "3. LR1 tasks" << endl
 			<< "0. Exit" << endl;
 
 		int choose;
@@ -273,7 +326,30 @@ int main()
 			encoded_moves();
 			break;
 		}
+		case 3:
+		{
+			string inputFileName;
+			string outputFileName;
+			string keyword;
+			ifstream inputFile;
+			ofstream outputFile;
+			char i, o;
+			int a;
+			int k = 0;
 
+			cout << "What to do?" << endl
+				<< "1. Encode" << endl
+				<< "2. Decode" << endl
+				<< "0. Exit" << endl;
+			cin >> a;
+			if (a == 0) break;
+			cout << endl;
+
+			NamesFilling(inputFileName, outputFileName, keyword);
+
+			Something(inputFile, inputFileName, outputFile, outputFileName, i, a, o, keyword, k);
+			break;
+		}
 		case 0: 
 		{
 			return 0;
