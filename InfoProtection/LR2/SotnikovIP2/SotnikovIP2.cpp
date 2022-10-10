@@ -207,13 +207,13 @@ void encoded_moves()
 	for (int i = 1; i < prediction + 1; ++i)
 	{
 		vector<int> freq = {};
-		for (int ii = 0; ii < 256; ++ii)
+		for (int j = 0; j < 256; ++j)
 		{
 			int temp = 0;
-			for (int iii = 0; (i - 1) + iii * prediction < text.size(); ++iii)
+			for (int k = 0; (i - 1) + k * prediction < text.size(); ++k)
 			{
-				char t = char(ii);
-				if (text[(i - 1) + iii * prediction] == t)
+				char t = char(j);
+				if (text[(i - 1) + k * prediction] == t)
 					temp++;
 			}
 			freq.push_back(temp);
