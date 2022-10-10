@@ -7,24 +7,44 @@
 using namespace std;
 
 
-multimap<char, int> frequency_letters(vector<char> text) 
+bool cmp(pair<char, int>& a, pair<char, int>& b)
+{
+	return a.second > b.second;
+}
+
+vector<pair<char, int>> sort(multimap<char, int> M)
+{
+	vector<pair<char, int>> A;
+
+	for (auto it : M)
+	{
+		A.push_back(it);
+	}
+
+	sort(A.begin(), A.end(), cmp);
+
+	return A;
+}
+
+vector<pair<char, int>> frequency_letters(vector<char> text)
 {
 	multimap<char, int> lettersCodes;
-	multimap<char, int> ::iterator it;
 	multimap<char, int> lettersFreqs;
 	int freq;
 
 	for (auto i : text)
 		lettersCodes.insert(pair<char, int>(i, (int)i));
-	for (int i = 0; i <= 255; i++) {
+	for (int i = -128; i <= 127; i++) {
 		freq = lettersCodes.count(i);
 		if (freq != 0)
 			lettersFreqs.insert(pair<char, int>(i, freq));
 	}
 
-	sort(lettersFreqs.begin(), lettersFreqs.end(), [](const pair<char, float>& p1, const pair<char, float>& p2) {return p1.second < p2.second; });
+	//sort(lettersFreqs.begin(), lettersFreqs.end(), [](const pair<char, float>& p1, const pair<char, float>& p2) {return p1.second < p2.second; });
 	
-	return lettersFreqs;
+	vector<pair<char, int>> sorted = sort(lettersFreqs);
+
+	return sorted;
 }
 
 float indexS(vector<char> text) 
@@ -41,7 +61,7 @@ float indexS(vector<char> text)
 			lettersFreqs.insert(pair<char, int>(i, freq));
 	}
 
-	float index;
+	float index = 0;
 	int N = text.size();
 
 	for (auto fi : lettersFreqs) {
@@ -65,7 +85,7 @@ void standard_analysis()
 	// Calculating parameters
 
 	float index = indexS(text);
-	multimap<char, int> freqLetters = frequency_letters(text);
+	vector<pair<char, int>> freqLetters = frequency_letters(text);
 
 	// Output
 
@@ -77,7 +97,7 @@ void standard_analysis()
 
 	for (auto it : freqLetters) 
 	{
-		cout << it.first << "(Probability: " << it.second << ")" << endl;
+		cout << it.first << " (Probability: " << it.second << ")" << endl;
 
 		i++;
 		if (i == 5)
@@ -137,20 +157,21 @@ void encoded_moves()
 
 	// Prediction
 
-	int prediction = 0;
+	/*int prediction = 0;
 	
 	for (auto it = indexesS.find(2); it != indexesS.end(); it++)
 	{
 		auto it_test = indexesS.find(1);
+		auto it_test2 = indexesS.find(3);
 		
-		if ((it->second > 2 * (it_test->second)) && (prediction == 0))
+		if ((it->second > (it_test->second)) && (prediction == 0) && (it->second > (it_test2->second)))
 		{
-			int prediction = it->second;
+			int prediction = it->first;
 			break;
 		}
 
 		it_test++;
-	}
+	}*/
 
 	// Output
 
@@ -158,19 +179,17 @@ void encoded_moves()
 
 	for (auto it : indexesS) cout << "Group " << it.first << ": " << it.second << endl;
 
-	cout << "Estimated key's length: " << prediction << ". Use it?" << endl
-		<< " Enter 0 for using estimated, or enter your key's length: ";
+	cout << endl <<  "Enter key length: ";
 
-	int length;
-	cin >> length;
+	int prediction;
+	cin >> prediction;
+	cout << endl << endl;
 
-	// Guessing code phrase
-
-	if (length == 0) length = prediction;
+	//-----------------TRY TO GUESS KEY WORD----------------------------------------
 
 	string guessedWord;
 
-	for (int i = 1; i != length + 1; i++)
+	for (int i = 1; i != prediction + 1; i++)
 	{
 		char testLetter = mostFrequentLetters.find(i)->second;
 		char space = ' ';
@@ -180,26 +199,50 @@ void encoded_moves()
 		guessedWord = guessedWord + guessedLetter;
 	}
 
-	cout << "Guessed word: " << guessedWord << endl << endl;
+	cout << "Guessed word (1st attempt): " << guessedWord << endl << endl;
 
+	//-----------------ANOTHER TRY TO GUESS KEY WORD-------------------------------
+
+	for (int i = 1; i < prediction + 1; ++i)
+	{
+		vector<int> freq = {};
+		for (int ii = 0; ii < 256; ++ii)
+		{
+			int temp = 0;
+			for (int iii = 0; (i - 1) + iii * prediction < text.size(); ++iii)
+			{
+				char t = char(ii);
+				if (text[(i - 1) + iii * prediction] == t)
+					temp++;
+			}
+			freq.push_back(temp);
+		}
+		int max = *max_element(freq.begin(), freq.end());
+		auto freq_symbol = find(freq.begin(), freq.end(), max);
+		int index = std::distance(freq.begin(), freq_symbol);
+		cout << "Guessed word (2st attempt): ";
+		cout << char(index - 32);
+	}
+
+	//-----------------------------------------------------------------------------
 	// Decryption
 
-	ifstream fin(filename, ios::binary);
-	ofstream fout(filename + "_decoded", ios::binary);
+	ifstream fin2(filename, ios::binary);
+	ofstream fout2(filename + "_decoded.txt", ios::binary);
 
 	char i, o;
 	int k = 0;
 
-	while (fin.get(i))
+	while (fin2.get(i))
 	{
 		o = i - guessedWord[k % guessedWord.size()];
-		fout << o;
+		fout2 << o;
 		k++;
 		break;
 	}
 
-	fin.close();
-	fout.close();
+	fin2.close();
+	fout2.close();
 
 	cout << "Done." << endl << endl;
 }
