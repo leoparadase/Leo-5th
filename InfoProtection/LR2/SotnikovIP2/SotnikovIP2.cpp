@@ -97,7 +97,7 @@ void standard_analysis()
 
 	for (auto it : freqLetters) 
 	{
-		cout << it.first << " (Probability: " << it.second << ")" << endl;
+		cout << it.first << " (Probability: " << (float(it.second) / float(text.size())) << ")" << endl;
 
 		i++;
 		if (i == 5)
@@ -185,24 +185,8 @@ void encoded_moves()
 	cin >> prediction;
 	cout << endl << endl;
 
-	//-----------------TRY TO GUESS KEY WORD----------------------------------------
-
+	//-----------------TRY TO GUESS KEY WORD-------------------------------
 	string guessedWord;
-
-	for (int i = 1; i != prediction + 1; i++)
-	{
-		char testLetter = mostFrequentLetters.find(i)->second;
-		char space = ' ';
-
-		char guessedLetter = testLetter - space;
-
-		guessedWord = guessedWord + guessedLetter;
-	}
-
-	cout << "Guessed word (1st attempt): " << guessedWord << endl << endl;
-
-	//-----------------ANOTHER TRY TO GUESS KEY WORD-------------------------------
-	guessedWord.clear();
 
 	for (int i = 1; i < prediction + 1; ++i)
 	{
@@ -223,7 +207,7 @@ void encoded_moves()
 		int index = std::distance(freq.begin(), freq_symbol);
 		guessedWord = guessedWord + char(index - 32);
 	}
-	cout << "Guessed word (2st attempt): " << guessedWord << endl << endl;
+	cout << "Guessed word: " << guessedWord << endl << endl;
 	//-----------------------------------------------------------------------------
 	// Decryption
 
@@ -305,8 +289,8 @@ int main()
 	{
 		cout << "Choose the action: " << endl << endl
 			<< "1. Standard's analysis" << endl
-			<< "2. Analysis & decryprtion of encoded file" << endl
-			<< "3. LR1 tasks" << endl
+			<< "2. Analysis & guessing keyword" << endl
+			<< "3. Encoding & decoding" << endl
 			<< "0. Exit" << endl;
 
 		int choose;
