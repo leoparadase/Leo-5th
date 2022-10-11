@@ -208,27 +208,6 @@ void encoded_moves()
 		guessedWord = guessedWord + char(index - 32);
 	}
 	cout << "Guessed word: " << guessedWord << endl << endl;
-	//-----------------------------------------------------------------------------
-	// Decryption
-
-	ifstream fin2(filename, ios::binary);
-	ofstream fout2(filename + "_decoded.txt", ios::binary);
-
-	char i, o;
-	int k = 0;
-
-	while (fin2.get(i))
-	{
-		o = i - guessedWord[k % guessedWord.size()];
-		fout2 << o;
-		k++;
-		break;
-	}
-
-	fin2.close();
-	fout2.close();
-
-	cout << "Done." << endl << endl;
 }
 
 void Something(std::ifstream& inputFile, std::string& inputFileName, std::ofstream& outputFile, std::string& outputFileName, char& i, int a, char& o, std::string& keyword, int& k)
