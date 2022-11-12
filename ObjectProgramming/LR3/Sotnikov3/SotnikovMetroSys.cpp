@@ -31,7 +31,7 @@ void SotnikovMetroSys::LoadFromFile(CArchive& ar)
     ar >> count;
     ar >> n;
     stations.clear();
-    stations.reserve(count); // ?
+    stations.reserve(count); 
     for (int i = 0; i < count; i++)
     {
         SotnikovStation* temp;
@@ -48,6 +48,6 @@ void ArchiveStations(CArchive& archive, shared_ptr<SotnikovStation> station)
 
 void SotnikovMetroSys::SaveToFile(CArchive& archive)
 {
-    archive << stations.size();
+    archive << stations.size() << 258;
     for_each(stations.begin(), stations.end(), bind(ArchiveStations, ref(archive), placeholders::_1));
 }

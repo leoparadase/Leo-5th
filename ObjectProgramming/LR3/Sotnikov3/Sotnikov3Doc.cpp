@@ -23,6 +23,7 @@
 IMPLEMENT_DYNCREATE(CSotnikov3Doc, CDocument)
 
 BEGIN_MESSAGE_MAP(CSotnikov3Doc, CDocument)
+	ON_COMMAND(ID_EDIT_DIALOG, &CSotnikov3Doc::OnEditDialog)
 END_MESSAGE_MAP()
 
 
@@ -136,3 +137,10 @@ void CSotnikov3Doc::Dump(CDumpContext& dc) const
 
 
 // Команды CSotnikov3Doc
+
+
+
+void CSotnikov3Doc::OnEditDialog()
+{
+	// TODO: добавьте свой код обработчика команд
+}

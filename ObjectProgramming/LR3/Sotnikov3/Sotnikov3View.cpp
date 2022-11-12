@@ -89,7 +89,7 @@ void CSotnikov3View::AssertValid() const
 {
 	CScrollView::AssertValid();
 }
-
+ 
 void CSotnikov3View::Dump(CDumpContext& dc) const
 {
 	CScrollView::Dump(dc);
