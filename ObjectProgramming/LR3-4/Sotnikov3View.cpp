@@ -23,6 +23,7 @@
 IMPLEMENT_DYNCREATE(CSotnikov3View, CScrollView)
 
 BEGIN_MESSAGE_MAP(CSotnikov3View, CScrollView)
+	ON_COMMAND(ID_EDIT_DIALOG, &CSotnikov3View::OnEditDialog)
 END_MESSAGE_MAP()
 
 // Создание или уничтожение CSotnikov3View
@@ -104,3 +105,11 @@ CSotnikov3Doc* CSotnikov3View::GetDocument() const // встроена неот�
 
 
 // Обработчики сообщений CSotnikov3View
+
+
+void CSotnikov3View::OnEditDialog()
+{
+	CSotnikovDialog EditDialog(GetDocument());
+	EditDialog.DoModal();
+	Invalidate();
+}

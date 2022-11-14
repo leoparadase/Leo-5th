@@ -1,6 +1,7 @@
 #pragma once
 #include "pch.h"
 #include "SotnikovStation.h"
+#include "CSotnikovDialog.h"
 
 SotnikovStation::SotnikovStation()
 {
@@ -65,4 +66,18 @@ void SotnikovStation::ViewWrite(CDC* pDC, int& h, int& w)
 	if (utext.GetLength() > w)
 		w = utext.GetLength();
 	h += 40;
+}
+
+void SotnikovStation::ReturnValues(CSotnikovDialog* dlg)
+{
+	dlg->s_id = to_string(this->id).c_str();
+	dlg->s_name = this->name;
+	dlg->s_line = to_string(this->line).c_str();
+}
+
+void SotnikovStation::TakingValues(CSotnikovDialog* dlg)
+{
+	id = stoi((LPCTSTR)(dlg->s_id));
+	name = (LPCTSTR)(dlg->s_name);
+	line = stoi((LPCTSTR)(dlg->s_line));
 }

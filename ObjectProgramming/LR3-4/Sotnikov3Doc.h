@@ -15,9 +15,11 @@ protected: // создать только из сериализации
 // Атрибуты
 public:
 	SotnikovMetroSys MetroSys;
+	void Add(CSotnikovDialog* dlg, int typeFlag);
+	void Modify(CSotnikovDialog* dlg, int pos);
 // Операции
 public:
-
+	
 // Переопределение
 public:
 	virtual BOOL OnNewDocument();

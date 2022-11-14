@@ -3,6 +3,7 @@
 //
 
 #pragma once
+#include "CSotnikovDialog.h"
 
 
 class CSotnikov3View : public CScrollView
@@ -38,6 +39,13 @@ protected:
 // Созданные функции схемы сообщений
 protected:
 	DECLARE_MESSAGE_MAP()
+
+/*
+public:
+	afx_msg void OnFileNew();
+*/
+public:
+	afx_msg void OnEditDialog();
 };
 
 #ifndef _DEBUG  // версия отладки в Sotnikov3View.cpp

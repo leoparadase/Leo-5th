@@ -1,5 +1,9 @@
 #pragma once
 #include "SotnikovStation.h"
+#include "pch.h"
+
+class CSotnikovDialog;
+
 class SotnikovTechStation :
     public SotnikovStation
 {
@@ -15,5 +19,8 @@ class SotnikovTechStation :
     
     virtual void Serialize(CArchive& f);
     virtual void ViewWrite(CDC* pDC, int& h, int& w);
+
+    virtual void ReturnValues(CSotnikovDialog* dlg);
+    virtual void TakingValues(CSotnikovDialog* dlg);
 };
 

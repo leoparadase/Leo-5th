@@ -35,6 +35,23 @@ CSotnikov3Doc::CSotnikov3Doc() noexcept
 
 }
 
+void CSotnikov3Doc::Add(CSotnikovDialog* dlg, int typeFlag)
+{
+	shared_ptr<SotnikovStation> s;
+	if (typeFlag == 0)
+		s = make_shared<SotnikovStation>();
+	else
+		s = make_shared<SotnikovTechStation>();
+
+	s->TakingValues(dlg);
+	MetroSys.stations.push_back(s);
+}
+
+void CSotnikov3Doc::Modify(CSotnikovDialog* dlg, int pos)
+{
+	MetroSys.stations.at(pos)->TakingValues(dlg);
+}
+
 CSotnikov3Doc::~CSotnikov3Doc()
 {
 }

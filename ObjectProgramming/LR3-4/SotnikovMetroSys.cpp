@@ -48,6 +48,6 @@ void ArchiveStations(CArchive& archive, shared_ptr<SotnikovStation> station)
 
 void SotnikovMetroSys::SaveToFile(CArchive& archive)
 {
-    archive << stations.size() << 258;
+    archive << stations.size();
     for_each(stations.begin(), stations.end(), bind(ArchiveStations, ref(archive), placeholders::_1));
 }

@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "SotnikovTechStation.h"
+#include "CSotnikovDialog.h"
 
 SotnikovTechStation::SotnikovTechStation()
 {
@@ -53,4 +54,16 @@ void SotnikovTechStation::ViewWrite(CDC* pDC, int& h, int& w)
 	if (utext.GetLength() > w)
 		w = utext.GetLength();
 	h += 40;
+}
+
+void SotnikovTechStation::ReturnValues(CSotnikovDialog* dlg)
+{
+	SotnikovStation::ReturnValues(dlg);
+	dlg->s_category = to_string(category).c_str();
+}
+
+void SotnikovTechStation::TakingValues(CSotnikovDialog* dlg)
+{
+	SotnikovStation::TakingValues(dlg);
+	category = stoi((LPCTSTR)(dlg->s_category));
 }

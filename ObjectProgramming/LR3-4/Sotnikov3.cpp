@@ -2,15 +2,18 @@
 // Sotnikov3.cpp: определяет поведение классов для приложения.
 //
 
+#pragma once
+
 #include "pch.h"
 #include "framework.h"
 #include "afxwinappex.h"
 #include "afxdialogex.h"
 #include "Sotnikov3.h"
 #include "MainFrm.h"
-
 #include "Sotnikov3Doc.h"
 #include "Sotnikov3View.h"
+#include "SotnikovStation.h"
+#include "SotnikovTechStation.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
