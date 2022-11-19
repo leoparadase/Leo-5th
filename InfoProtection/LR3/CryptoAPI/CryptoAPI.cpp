@@ -302,9 +302,9 @@ public:
 	}
 };
 
-void CryptoTest()
+void Encoding()
 {
-	{
+	{ // Encoding
 		CryptoAPI crypto;
 
 		string public_key_name;
@@ -374,9 +374,11 @@ void CryptoTest()
 			crypto.EncryptData(in, out, (DWORD)filesystem::file_size(init_file));
 		}
 	}
+}
 
-	
-	{
+void Decoding()
+{
+	{ // Decoding
 		CryptoAPI crypto;
 
 		string public_key_name;
@@ -406,14 +408,34 @@ void CryptoTest()
 		crypto.GenExportKey(password);
 		{
 			ifstream in(private_key_name, ios::binary);
-			vector v(istreambuf_iterator<char>{in}, {});
-			crypto.ImportPrivateKey(v);
+
+			if (in.good())
+			{
+				vector v(istreambuf_iterator<char>{in}, {});
+				crypto.ImportPrivateKey(v);
+			}
+			else
+			{
+				cout << "No access to private key!" << endl;
+				vector <char> v = { ' ' };
+				crypto.ImportPrivateKey(v);
+			}
 		}
 
 		{
 			ifstream in(public_key_name, ios::binary);
-			vector v(istreambuf_iterator<char>{in}, {});
-			crypto.ImportPublicKey(v);
+
+			if (in.good())
+			{
+				vector v(istreambuf_iterator<char>{in}, {});
+				crypto.ImportPublicKey(v);
+			}
+			else
+			{
+				cout << "No access to public key!" << endl;
+				vector <char> v = { ' ' };
+				crypto.ImportPublicKey(v);
+			}
 		}
 
 		{
@@ -427,7 +449,7 @@ void CryptoTest()
 			string str;
 
 			getline(in, session_enc_key);
-			
+
 
 			vector<char> session_extracted_key(session_enc_key.begin(), session_enc_key.end());
 
@@ -443,29 +465,31 @@ void CryptoTest()
 			string line;
 
 			ifstream fin;
-			fin.open("example.txt");
+			fin.open(init_file);
 			ofstream temp;
-			temp.open("temp.txt");
-			cout << "Which line do you want to remove? ";
-			cin >> deleteline;
+			temp.open(init_file + ".temp");
 
 			while (getline(fin, line))
 			{
-				line.replace(line.find(deleteline), deleteline.length(), "");
+				line.replace(line.find(session_enc_key), session_enc_key.length(), "");
 				temp << line << endl;
 
 			}
 
 			temp.close();
 			fin.close();
-			remove("example.txt");
-			rename("temp.txt", "example.txt");
+
+			const char* origin = init_file.c_str();
+			const char* newf = (init_file + ".temp").c_str();
+
+			remove(origin);
+			rename(newf, origin);
 
 			// ----- END OF DELETING LINE -----
 
-			ifstream in(init_file, ios::binary);
+			ifstream inN(init_file, ios::binary);
 			ofstream out(decoded_file, ios::binary);
-			crypto.DecryptData(in, out, (DWORD)filesystem::file_size(init_file));
+			crypto.DecryptData(inN, out, (DWORD)filesystem::file_size(init_file));
 		}
 
 		{
@@ -475,6 +499,14 @@ void CryptoTest()
 		}
 	}
 }
+
+//void CryptoTest()
+//{
+//	Encoding();
+//
+//	
+//	Decoding();
+//}
 
 int main()
 {     
@@ -493,7 +525,37 @@ int main()
 		}
 		else
 		{
-			CryptoTest();
+			// CryptoTest(); // Move to separate functions!
+
+			while (1)
+			{
+				cout << "Choose the action:" << endl << endl
+					<< "1. Encode file" << endl
+					<< "2. Decode file" << endl
+					<< "0. Exit" << endl << endl;
+
+				int choose;
+				cin >> choose;
+
+				switch (choose)
+				{
+				case 1:
+				{
+					Encoding();
+					break;
+				}
+				case 2:
+				{
+					Decoding();
+					break;
+				}
+				default:
+				{
+					return 0;
+					break;
+				}
+				}
+			}
 		}
 	}
 	else
