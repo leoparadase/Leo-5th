@@ -302,9 +302,47 @@ public:
 	}
 };
 
+void KeyGen()
+{
+	CryptoAPI crypto;
+	string public_key_name;
+	string private_key_name;
+	string password;
+
+	cout << "Enter name for public key: ";
+	cin >> public_key_name;
+
+	cout << endl << "Enter name for private key: ";
+	cin >> private_key_name;
+
+	cout << endl << "Enter password: ";
+	cin >> password;
+
+	cout << endl;
+
+	crypto.GenKeyPair();
+	crypto.GenExportKey(password);
+
+	{
+		vector<char> v;
+		crypto.ExportPrivateKey(v);
+		ofstream out(private_key_name, ios::binary);
+		out.write(v.data(), v.size());
+	}
+
+	{
+		vector<char> v;
+		crypto.ExportPublicKey(v);
+		ofstream out(public_key_name, ios::binary);
+		out.write(v.data(), v.size());
+	}
+
+	cout << "Keys generated." << endl;
+}
+
 void Encoding()
 {
-	{ // Encoding
+	{
 		CryptoAPI crypto;
 
 		string public_key_name;
@@ -333,28 +371,33 @@ void Encoding()
 
 		crypto.GenKeyPair();
 		crypto.GenSessionKey();
-		crypto.GenExportKey(password);
 
 		{
-			vector<char> v;
-			crypto.ExportPrivateKey(v);
-			ofstream out(private_key_name, ios::binary);
-			out.write(v.data(), v.size());
+			ifstream in(private_key_name, ios::binary);
+
+			if (in.good())
+			{
+				vector v(istreambuf_iterator<char>{in}, {});
+				crypto.ImportPrivateKey(v);
+			}
+			else
+			{
+				cout << "No access to private key!" << endl;
+			}
 		}
 
 		{
-			vector<char> v;
-			crypto.ExportPublicKey(v);
-			ofstream out(public_key_name, ios::binary);
-			out.write(v.data(), v.size());
-		}
+			ifstream in(public_key_name, ios::binary);
 
-		// CryptExportKey не шифрует, а подписывает сессионные ключи, поэтому лучше использовать следующий блок
-		{
-			//vector<char> v;
-			//crypto.ExportSessionKey(v);
-			//ofstream out("session.key", ios::binary);
-			//out.write(v.data(), v.size());
+			if (in.good())
+			{
+				vector v(istreambuf_iterator<char>{in}, {});
+				crypto.ImportPublicKey(v);
+			}
+			else
+			{
+				cout << "No access to public key!" << endl;
+			}
 		}
 
 		{
@@ -362,23 +405,37 @@ void Encoding()
 			vector<char> v2;
 			crypto.ExportSessionKey(v1);
 			crypto.EncryptData(v1, v2, crypto.GetExchangeKey(), true);
-			//ofstream out("session.enc.key", ios::binary);
-			//out.write(v2.data(), v2.size());
-			session_enc_key = v2.data() + v2.size();
+			string temp(v2.begin(), v2.end());
+			session_enc_key = temp;
 		}
 
 		{
 			ifstream in(init_file, ios::binary);
 			ofstream out(encoded_file, ios::binary);
-			out << session_enc_key;
-			crypto.EncryptData(in, out, (DWORD)filesystem::file_size(init_file));
+			
+			try
+			{
+				crypto.EncryptData(in, out, (DWORD)filesystem::file_size(init_file));
+				out << '\n' << "SK" << '\n';
+				for (auto& ch : session_enc_key)
+				{
+					out << ch;
+				}
+			}
+			catch (...)
+			{
+				cout << endl << "Unattented exception." << endl << endl;
+			}
+			
+			in.close();
+			out.close();
 		}
 	}
 }
 
 void Decoding()
 {
-	{ // Decoding
+	{
 		CryptoAPI crypto;
 
 		string public_key_name;
@@ -405,6 +462,7 @@ void Decoding()
 
 		cout << endl;
 
+		crypto.GenKeyPair();
 		crypto.GenExportKey(password);
 		{
 			ifstream in(private_key_name, ios::binary);
@@ -417,8 +475,6 @@ void Decoding()
 			else
 			{
 				cout << "No access to private key!" << endl;
-				vector <char> v = { ' ' };
-				crypto.ImportPrivateKey(v);
 			}
 		}
 
@@ -433,80 +489,63 @@ void Decoding()
 			else
 			{
 				cout << "No access to public key!" << endl;
-				vector <char> v = { ' ' };
-				crypto.ImportPublicKey(v);
 			}
-		}
-
-		{
-			//ifstream in("session.key", ios::binary);
-			//vector v(istreambuf_iterator<char>{in}, {});
-			//crypto.ImportSessionKey(v);
 		}
 
 		{
 			ifstream in(init_file, ios::binary);
 			string str;
+			vector<char> data;
+			vector<char> s_key;
 
-			getline(in, session_enc_key);
-
-
-			vector<char> session_extracted_key(session_enc_key.begin(), session_enc_key.end());
-
-			//vector v1(session_extracted_key, {}); // NEED FIGURE PARENTHESS?
-			vector<char> v2;
-			crypto.DecryptData(session_extracted_key, v2, crypto.GetExchangeKey(), true);
-			crypto.ImportSessionKey(v2);
+			while (getline(in, str))
+			{
+				if (str != "SK")
+				{
+					copy(str.begin(), str.end(), back_inserter(data));
+					data.push_back('\n');
+				}
+				else
+				{
+					data.pop_back();
+					break;
+				}
+			}
+			while (getline(in, str))
+			{
+				copy(str.begin(), str.end(), back_inserter(s_key));
+				s_key.push_back('\n');
+			}
+			s_key.pop_back();
 			in.close();
 
-			// ----- DELETING LINE -----
-
-			string deleteline;
-			string line;
-
-			ifstream fin;
-			fin.open(init_file);
-			ofstream temp;
-			temp.open(init_file + ".temp");
-
-			while (getline(fin, line))
-			{
-				line.replace(line.find(session_enc_key), session_enc_key.length(), "");
-				temp << line << endl;
-
-			}
-
+			ofstream temp(init_file + ".temp", ios::binary);
+			for (auto& ch : data)
+				temp << ch;
 			temp.close();
-			fin.close();
 
-			const char* origin = init_file.c_str();
-			const char* newf = (init_file + ".temp").c_str();
+			vector<char> v2;
 
-			remove(origin);
-			rename(newf, origin);
+			ifstream inN(init_file + ".temp", ios::binary);
+			ofstream outN(decoded_file, ios::binary);
 
-			// ----- END OF DELETING LINE -----
+			try
+			{
+				crypto.DecryptData(s_key, v2, crypto.GetExchangeKey(), true);
+				crypto.ImportSessionKey(v2);
+				crypto.DecryptData(inN, outN, (DWORD)filesystem::file_size(init_file + ".temp"));
+			}
+			catch (...)
+			{
+				cout << endl << "Check password or file's accessibility." << endl << endl;
+			}
+			 
 
-			ifstream inN(init_file, ios::binary);
-			ofstream out(decoded_file, ios::binary);
-			crypto.DecryptData(inN, out, (DWORD)filesystem::file_size(init_file));
-		}
-
-		{
-			//ifstream in("CryptoAPI.cpp.enc", ios::binary);
-			//ofstream out("CryptoAPI.cpp.dec", ios::binary);
-			//crypto.DecryptData(in, out, (DWORD)filesystem::file_size("CryptoAPI.cpp.enc"));
+			inN.close();
+			outN.close();
 		}
 	}
 }
-
-//void CryptoTest()
-//{
-//	Encoding();
-//
-//	
-//	Decoding();
-//}
 
 int main()
 {     
@@ -532,6 +571,7 @@ int main()
 				cout << "Choose the action:" << endl << endl
 					<< "1. Encode file" << endl
 					<< "2. Decode file" << endl
+					<< "3. Generate keys" << endl
 					<< "0. Exit" << endl << endl;
 
 				int choose;
@@ -547,6 +587,11 @@ int main()
 				case 2:
 				{
 					Decoding();
+					break;
+				}
+				case 3:
+				{
+					KeyGen();
 					break;
 				}
 				default:
