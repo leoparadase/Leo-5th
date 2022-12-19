@@ -10,24 +10,8 @@ SotnikovTechStation::~SotnikovTechStation()
 {
 }
 
-IMPLEMENT_SERIAL(SotnikovTechStation, SotnikovStation, 1)
+IMPLEMENT_SERIAL(SotnikovTechStation, SotnikovStation, VERSIONABLE_SCHEMA | 1)
 
-//void SotnikovTechStation::c_in()
-//{
-//	SotnikovStation::c_in();
-//
-//	cout << "Category: ";
-//	cin >> category;
-//
-//	//cout << endl << endl;
-//}
-//
-//void SotnikovTechStation::c_out()
-//{
-//	SotnikovStation::c_out();
-//
-//	cout << "Category: " << category;
-//}
 
 void SotnikovTechStation::Serialize(CArchive& f)
 {
@@ -44,12 +28,12 @@ void SotnikovTechStation::Serialize(CArchive& f)
 
 void SotnikovTechStation::ViewWrite(CDC* pDC, int& h, int& w)
 {
-	CString utext1 = _T("Tech station:");
+	CString utext1 = ("Tech station:");
 	pDC->TextOut(0, h, utext1);
 	if (utext1.GetLength() > w)
 		w = utext1.GetLength();
 	h += 40;
-	CString utext = _T("Name: ") + name + _T(";   ID: ") + to_string(id).c_str() + _T(";   Line: ") + to_string(line).c_str() + _T(";   Category: ") + to_string(category).c_str();
+	CString utext = ("Name: ") + name + (";   ID: ") + to_string(id).c_str() + (";   Line: ") + to_string(line).c_str() + (";   Category: ") + to_string(category).c_str();
 	pDC->TextOut(0, h, utext);
 	if (utext.GetLength() > w)
 		w = utext.GetLength();

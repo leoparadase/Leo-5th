@@ -8,6 +8,7 @@ class CSotnikovDialog;
 class SotnikovStation :
     public CObject
 {
+public:
     DECLARE_SERIAL(SotnikovStation);
 
     CString name;

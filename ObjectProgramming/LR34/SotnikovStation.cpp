@@ -11,35 +11,7 @@ SotnikovStation::~SotnikovStation()
 {
 }
 
-IMPLEMENT_SERIAL(SotnikovStation, CObject, 1)
-
-//void SotnikovStation::c_in()
-//{
-//	string temp;
-//
-//	cout << "Ready to read the station properties:" << endl << endl;
-//
-//	cout << "ID: ";
-//	cin >> id;
-//
-//	cout << "Name: ";
-//	getline(cin >> ws, temp);
-//	name = temp.c_str();
-//
-//	cout << "Line: ";
-//	cin >> line;
-//
-//	//cout << endl << endl;
-//}
-
-//void SotnikovStation::c_out()
-//{
-//
-//	cout << "ID: " << id << endl
-//		<< "Name: " << (LPCTSTR)name << endl
-//		<< "Line: " << line << endl;
-//
-//}
+IMPLEMENT_SERIAL(SotnikovStation, CObject, 0)
 
 void SotnikovStation::Serialize(CArchive& f)
 {
@@ -56,12 +28,12 @@ void SotnikovStation::Serialize(CArchive& f)
 
 void SotnikovStation::ViewWrite(CDC* pDC, int& h, int& w)
 {
-	CString utext1 = _T("Station:");
+	CString utext1 = ("Station:");
 	pDC->TextOut(0, h, utext1);
 	if (utext1.GetLength() > w)
 		w = utext1.GetLength();
 	h += 40;
-	CString utext = _T("Name: ") + name + _T(";   ID: ") + to_string(id).c_str() + _T(";   Line: ") + to_string(line).c_str();
+	CString utext = ("Name: ") + name + (";   ID: ") + to_string(id).c_str() + (";   Line: ") + to_string(line).c_str();
 	pDC->TextOut(0, h, utext);
 	if (utext.GetLength() > w)
 		w = utext.GetLength();

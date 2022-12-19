@@ -1,5 +1,9 @@
 #include "pch.h"
 #include "SotnikovMetroSys.h"
+#include "SotnikovStation.h"
+#include "SotnikovTechStation.h"
+
+
 
 SotnikovMetroSys::SotnikovMetroSys()
 {
@@ -49,5 +53,11 @@ void ArchiveStations(CArchive& archive, shared_ptr<SotnikovStation> station)
 void SotnikovMetroSys::SaveToFile(CArchive& archive)
 {
     archive << stations.size();
-    for_each(stations.begin(), stations.end(), bind(ArchiveStations, ref(archive), placeholders::_1));
+
+    for (auto it : stations)
+    {
+        archive << it.get();
+    }
+
+    //for_each(stations.begin(), stations.end(), bind(ArchiveStations, ref(archive), placeholders::_1));
 }

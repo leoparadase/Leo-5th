@@ -7,6 +7,7 @@ class CSotnikovDialog;
 class SotnikovTechStation :
     public SotnikovStation
 {
+public:
     DECLARE_SERIAL(SotnikovTechStation);
 
     int category;
