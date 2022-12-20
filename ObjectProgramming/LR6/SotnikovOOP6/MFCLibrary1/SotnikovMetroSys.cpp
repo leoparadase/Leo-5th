@@ -19,6 +19,8 @@ void SotnikovMetroSys::SaveToFile(const char* szPath)
 	CArchive ar(&out, CArchive::store);
 
 	ar << stations.size();
+	ar << 121212;
+
 	for (auto s : stations)
 	{
 		ar << s.get();
@@ -37,7 +39,7 @@ void SotnikovMetroSys::LoadFromFile(const char* szPath)
 	int size, n;
 
 	ar >> size;
-	//ar >> n;
+	ar >> n;
 
 	for (int i = 0; i < size; i++) {
 		SotnikovStation* s = new SotnikovStation;
